@@ -16,7 +16,7 @@ Definition to_z (f: finz): Z :=
 
 Definition of_z (z : Z) : option finz.
 Proof.
-  destruct (Z_lt_dec z finz_bound),(Z_le_dec 0 z).
+  destruct (Z_lt_dec z finz_bound),(Z_le_dec 0%Z z).
   - apply (Z.ltb_lt z finz_bound) in l.
     apply (Z.leb_le 0 z) in l0.
     exact (Some (FinZ z l l0)).
@@ -42,7 +42,7 @@ Program Definition incr (f : finz) (off : Z) : option finz :=
   let z := (to_z f + off)%Z in
   match (Z_lt_dec z finz_bound) with
   | left _ =>
-    match (Z_le_dec 0 z) with
+    match (Z_le_dec 0%Z z) with
     | left _ => Some (FinZ z _ _)
     | right _ => None
     end
@@ -150,7 +150,7 @@ Proof.
   set (z := (finz.to_z f)) in *.
   unfold finz.of_z.
   destruct (Z_lt_dec z finz_bound) eqn:?;
-  destruct (Z_le_dec 0 z) eqn:?.
+  destruct (Z_le_dec 0%Z z) eqn:?.
   { f_equal. apply finz_to_z_eq. cbn. lia. }
   all: lia.
 Qed.
@@ -171,7 +171,7 @@ Proof.
   intro r. destruct r; auto.
   rewrite decode_encode.
   unfold finz.of_z. simpl.
-  destruct (Z_lt_dec z finz_bound),(Z_le_dec 0 z).
+  destruct (Z_lt_dec z finz_bound),(Z_le_dec 0%Z z).
   - repeat f_equal; apply eq_proofs_unicity; decide equality.
   - exfalso. by apply (Z.leb_le 0 z) in finz_nonneg.
   - exfalso. by apply (Z.ltb_lt z finz_bound) in finz_lt.
