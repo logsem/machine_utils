@@ -43,16 +43,16 @@ Proof using. intros [? ?]. rewrite /finz.dist. solve_finz. Qed.
 
 Lemma finz_dist_incr_default (a b : finz finz_bound) :
   (b ≤ a)%Z →
-  ((b ^+ finz.dist b a) = a)%f.
+  (b ^+ (Z.of_nat (finz.dist b a)) = a)%f.
 Proof using. intros Hle. rewrite /finz.dist. solve_finz. Qed.
 
 Lemma finz_dist_incr (a b : finz finz_bound) :
   (b <= a)%f →
-  (b + finz.dist b a)%f = Some a.
+  (b + (Z.of_nat (finz.dist b a)))%f = Some a.
 Proof using. intros. unfold finz.dist. solve_finz. Qed.
 
 Lemma finz_incr_iff_dist (a b : finz finz_bound) (i : nat) :
-  (a + i)%f = Some b ↔ (a <= b)%f ∧ finz.dist a b = i.
+  (a + (Z.of_nat i))%f = Some b ↔ (a <= b)%f ∧ finz.dist a b = i.
 Proof using.
   rewrite /finz.dist. split; [ intros | intros [? ?] ]; solve_finz.
 Qed.
@@ -69,7 +69,7 @@ Proof using. done. Qed.
 
 Lemma finz_seq_decomposition n f k :
   (k <= n)%nat ->
-  finz.seq f n = finz.seq f k ++ (finz.seq ((f ^+ k)%f) (n - k)).
+  finz.seq f n = finz.seq f k ++ (finz.seq ((f ^+ (Z.of_nat k))%f) (n - k)).
 Proof using.
   revert f k. induction n.
   - intros. assert ((k = 0)%nat) by lia; subst k. reflexivity.
@@ -90,7 +90,7 @@ Proof using.
 Qed.
 
 Lemma finz_seq_NoDup f (n : nat) :
-  is_Some (f + n)%f →
+  is_Some (f + (Z.of_nat n))%f →
   NoDup (finz.seq f n).
 Proof using.
   revert f. induction n; intros f Hfn.
@@ -102,7 +102,7 @@ Qed.
 
 Lemma finz_seq_lookup f0 fi (i n : nat) :
   i < n →
-  (f0 + i)%f = Some fi →
+  (f0 + (Z.of_nat i))%f = Some fi →
   finz.seq f0 n !! i = Some fi.
 Proof using.
   revert i fi f0. induction n.
@@ -148,7 +148,7 @@ Proof with try (unfold finz.dist; solve_finz) using.
   intros [? ?]. unfold finz.seq_between at 1.
   rewrite (finz_seq_decomposition _ _ (finz.dist b a))...
   rewrite (_: finz.dist b e - finz.dist b a = finz.dist a e)...
-  rewrite (_: (b ^+ finz.dist b a)%f = a)...
+  rewrite (_: (b ^+ (Z.of_nat (finz.dist b a)))%f = a)...
   rewrite -/(finz.seq_between _ _) //.
 Qed.
 
@@ -213,8 +213,8 @@ Qed.
 
 Lemma finz_seq_between_lookup f0 fn (i n : nat) :
   i < n →
-  (f0 + n)%f = Some fn →
-  (finz.seq_between f0 fn) !! i = Some (f0 ^+ i)%f.
+  (f0 + (Z.of_nat n))%f = Some fn →
+  (finz.seq_between f0 fn) !! i = Some (f0 ^+ (Z.of_nat i))%f.
 Proof using.
   intros Hin Hfn.
   rewrite /finz.seq_between.
