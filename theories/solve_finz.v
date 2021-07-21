@@ -299,3 +299,8 @@ Proof.
   solve_finz_close_proof.
 Qed.
 
+Goal forall (word_size: Z) (T: Type) (pid: T) (finz_of: T -> finz word_size),
+    (((finz_of pid) ^+ 1) ^+ 1)%f = ((finz_of pid) ^+ 2)%f.
+Proof.
+  solve_finz.
+Qed.
