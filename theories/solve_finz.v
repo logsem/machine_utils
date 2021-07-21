@@ -197,15 +197,30 @@ Ltac zify_finz_op_branching_hyps_step :=
     finz_incr_as_spec f x
   end.
 
-Ltac zify_finz_ty_step :=
+Ltac zify_finz_ty_step_on f :=
+  generalize (finz_spec _ f); intros [? ?];
+  let z := fresh "z" in
+  fast_set z (finz.to_z f);
+  clearbody z;
+  first [ clear f | revert dependent f ].
+
+Ltac zify_finz_ty_step_var :=
   lazymatch goal with
-  | f : finz _ |- _ =>
-    generalize (finz_spec _ f); intros [? ?];
-    let z := fresh "z" in
-    fast_set z (finz.to_z f);
-    clearbody z;
-    first [ clear f | revert dependent f ]
+  | f : finz _ |- _ => zify_finz_ty_step_on f
   end.
+
+Ltac zify_finz_ty_step_subterm :=
+  match goal with
+  | H : context [ ?x ] |- _ =>
+    lazymatch type of x with finz _ =>
+      let X := fresh in
+      set (X := x) in *;
+      zify_finz_ty_step_on X
+    end
+  end.
+
+Ltac zify_finz_ty_step :=
+  first [ zify_finz_ty_step_var | zify_finz_ty_step_subterm ].
 
 (** zify_finz **)
 (* This greedily translates all the address-related terms in the goal and in the
