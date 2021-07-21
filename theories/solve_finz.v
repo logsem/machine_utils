@@ -85,6 +85,40 @@ Ltac finz_largest_as_spec f :=
   fast_set fx (finz.largest f);
   clearbody fx.
 
+Lemma finz_of_z_spec fb (z : Z) :
+  (exists (f : finz fb),
+    finz.of_z z = Some f ∧ finz.to_z f = z) ∨
+  (@finz.of_z fb z = None ∧ (z >= fb ∨ z < 0))%Z.
+Proof.
+  unfold finz.of_z.
+  destruct (Z_lt_dec z fb).
+  { destruct (Z_le_dec 0%Z z).
+    { left. eexists. split; auto. }
+    { right; split; auto; lia. } }
+  { right. destruct (Z_le_dec 0%Z z); split; auto; lia. }
+Qed.
+
+Ltac finz_of_z_as_spec z :=
+  generalize (finz_of_z_spec z); intros [[? [? ?]] | [? [?|?]]];
+  let o := fresh "o" in
+  fast_set o (finz.of_z z);
+  clearbody o; subst o.
+
+Lemma finz_of_z_is_Some_spec fb z (f : finz fb) :
+  finz.of_z z = Some f →
+  finz.to_z f = z.
+Proof.
+  destruct (finz_of_z_spec fb z) as [[? [? ?]]|[? ?]]; congruence.
+Qed.
+
+Lemma finz_of_z_Some_spec z fb (f : finz fb) :
+  finz.to_z f = z →
+  finz.of_z z = Some f.
+Proof.
+  intros. destruct (finz_of_z_spec fb z) as [[? [? ?]]|[? ?]].
+  all: subst; rewrite finz_of_z_to_z in *; auto.
+Qed.
+
 Lemma Some_eq_inj A (x y: A) :
   Some x = Some y ->
   x = y.
@@ -165,6 +199,10 @@ Ltac zify_finz_op_nonbranching_step :=
   | |- is_Some (finz.incr _ _) =>
     apply finz_incr_is_Some_spec
 
+  | H : finz.of_z _ = Some _ |- _ =>
+    apply finz_of_z_is_Some_spec in H
+  | |- finz.of_z _ = Some _ =>
+    apply finz_of_z_Some_spec
   end || zify_finz_op_nonbranching_step_hook.
 
 (* We need some reduction, but naively calling "cbn in *" causes performance
@@ -189,12 +227,16 @@ Ltac zify_finz_op_branching_goal_step :=
   lazymatch goal with
   | |- context [ finz.incr ?f ?x ] =>
     finz_incr_as_spec f x
+  | |- context [ finz.of_z ?x ] =>
+    finz_of_z_as_spec x
   end.
 
 Ltac zify_finz_op_branching_hyps_step :=
   lazymatch goal with
   | _ : context [ finz.incr ?f ?x ] |- _ =>
     finz_incr_as_spec f x
+  | _ : context [ finz.of_z ?x ] |- _ =>
+    finz_of_z_as_spec x
   end.
 
 Ltac zify_finz_ty_step_on f :=
@@ -299,8 +341,11 @@ Proof.
   solve_finz_close_proof.
 Qed.
 
-Goal forall (word_size: Z) (T: Type) (pid: T) (finz_of: T -> finz word_size),
+Goal forall (word_size : Z) (T : Type) (pid : T) (finz_of : T -> finz word_size),
     (((finz_of pid) ^+ 1) ^+ 1)%f = ((finz_of pid) ^+ 2)%f.
-Proof.
-  solve_finz.
-Qed.
+Proof. solve_finz. Qed.
+
+Goal forall fb (f f' : finz fb),
+  (f + 15)%f = Some f' →
+  finz.of_z (f + 4) = Some (f ^+ 4)%f.
+Proof. solve_finz. Qed.
