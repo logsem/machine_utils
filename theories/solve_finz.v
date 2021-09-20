@@ -270,6 +270,14 @@ Ltac zify_finz_op_nonbranching_step :=
   | |- finz.of_z _ = Some _ =>
     apply finz_of_z_Some_spec
 
+  | H : is_Some (finz.mult _ _) |- _ =>
+    destruct H
+  | H : finz.mult _ _ = Some _ |- _ =>
+    apply finz_mult_Some_spec in H;
+    destruct H as (? & ? & ?)
+  | |- is_Some (finz.mult _ _) =>
+    apply finz_mult_is_Some_spec
+
   end || zify_finz_op_nonbranching_step_hook.
 
 (* We need some reduction, but naively calling "cbn in *" causes performance
