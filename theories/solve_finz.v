@@ -73,7 +73,7 @@ Ltac finz_incr_default_as_spec f x :=
   clearbody fx.
 
 Lemma finz_min_spec fb (f1 f2 : finz fb) :
-  ∃ f, finz.min f1 f2 = f ∧ (f : Z) = Z.min (f1 : Z) (f2 : Z).
+  ∃ f, finz.min f1 f2 = f ∧ ( f : Z) = Z.min (f1 : Z) (f2 : Z).
 Proof.
   exists (finz.min f1 f2); split; auto.
   unfold finz.min. case_match. all: unfold finz.leb in *; lia.
@@ -97,6 +97,66 @@ Ltac finz_max_as_spec f1 f2 :=
   let fx := fresh "fx" in
   fast_set fx (finz.max f1 f2);
   clearbody fx; subst fx.
+
+Lemma finz_mult_spec (fb : Z) (f : finz fb) (z : Z) :
+  (∃ (f': finz fb),
+   (f * z)%f = Some f' ∧ f * z <= fb ∧ (0 < f ∧ 0 <= z ∨ 0= f) ∧ (f':Z) = f * z)%Z
+  ∨
+  ((f * z)%f = None ∧ (f * z >= fb ∨ z < 0))%Z.
+Proof.
+  unfold finz.mult.
+  destruct (Z_lt_dec (f * z)%Z fb),(Z_le_dec 0%Z (f * z)%Z); [ left | right; split; auto; try lia..].
+  eexists.  repeat split. lia.
+  destruct (decide (0< f)%Z).
+  - left;lia.
+  - right. destruct f. cbn in *. lia.
+  - right. destruct f. cbn in *. lia.
+Qed.
+
+Ltac finz_mult_as_spec f x :=
+  generalize (finz_mult_spec _ f x); intros [(?&?&?&[[?  ?]|?]&?)|(?&[?|?])];
+  let fx := fresh "fx" in
+  fast_set fx (finz.mult f x);
+  clearbody fx; subst fx.
+
+(* Non-branching lemma for the special case of an assumption [(a + z) = Some a'],
+   which is common in practice. *)
+Lemma finz_incr_Some_spec fb (f f' : finz fb) (z : Z) :
+  (f + z)%f = Some f' →
+  (f + z < fb ∧ 0 ≤ f + z ∧ (f':Z) = f + z)%Z.
+Proof.
+  unfold finz.incr.
+  destruct (Z_lt_dec (f + z)%Z fb),(Z_le_dec 0%Z (f + z)%Z); inversion 1.
+  repeat split; lia.
+Qed.
+
+Lemma finz_incr_is_Some_spec fb (f : finz fb) (z : Z) :
+  (f + z < fb ∧ 0 ≤ f + z)%Z →
+  is_Some (f + z)%f.
+Proof.
+  unfold finz.incr.
+  destruct (Z_lt_dec (f + z)%Z fb),(Z_le_dec 0%Z (f + z)%Z); eauto; lia.
+Qed.
+
+Lemma finz_mult_Some_spec fb (f f' : finz fb) (z : Z) :
+  (f * z)%f = Some f' →
+  (f * z < fb ∧ (0 < f ∧ 0 <= z ∨ 0= f) ∧ (f':Z) = f * z)%Z.
+Proof.
+  unfold finz.mult.
+  destruct (Z_lt_dec (f * z)%Z fb),(Z_le_dec 0%Z (f * z)%Z); inversion 1.
+ repeat split;try lia...
+  destruct (decide (0< f)%Z).
+  - left;lia.
+  - right. destruct f. cbn in *. lia.
+Qed.
+
+Lemma finz_mult_is_Some_spec fb (f : finz fb) (z : Z) :
+  (f * z < fb ∧ (0 < f ∧ 0 <= z ∨ 0= f))%Z →
+  is_Some (f * z)%f.
+Proof.
+  unfold finz.mult.
+  destruct (Z_lt_dec (f * z)%Z fb),(Z_le_dec 0%Z (f * z)%Z); eauto; try lia.
+Qed.
 
 Lemma finz_largest_spec fb (f : finz fb) :
   finz.to_z (finz.largest f) = (fb - 1)%Z.
@@ -195,6 +255,14 @@ Ltac zify_finz_op_nonbranching_step :=
     unfold finz.eqb
   | H : context [ finz.eqb _ _ ] |- _ =>
     unfold finz.eqb in H
+  | H : context [ finz.incr_default _ _ ] |- _ =>
+    unfold finz.incr_default in H
+  | |- context [ finz.incr_default _ _ ] =>
+    unfold finz.incr_default
+  | H : context [ finz.mult_default _ _ ] |- _ =>
+    unfold finz.mult_default in H
+  | |- context [ finz.mult_default _ _ ] =>
+    unfold finz.mult_default
 
   | H : context [ finz.min ?f1 ?f2 ] |- _ =>
     finz_min_as_spec f1 f2
@@ -229,6 +297,14 @@ Ltac zify_finz_op_nonbranching_step :=
     apply finz_of_z_is_Some_spec in H
   | |- finz.of_z _ = Some _ =>
     apply finz_of_z_Some_spec
+  | H : is_Some (finz.mult _ _) |- _ =>
+    destruct H
+  | H : finz.mult _ _ = Some _ |- _ =>
+    apply finz_mult_Some_spec in H;
+    destruct H as (? & ? & ?)
+  | |- is_Some (finz.mult _ _) =>
+    apply finz_mult_is_Some_spec
+
   end || zify_finz_op_nonbranching_step_hook.
 
 (* We need some reduction, but naively calling "cbn in *" causes performance
@@ -238,11 +314,11 @@ Ltac zify_finz_op_nonbranching_step :=
      unfolds to a concrete list of instructions and we want its length to compute.
 *)
 Ltac solve_finz_cbn :=
-  cbn [finz.to_z finz.incr_default fst snd length];
+  cbn [finz.to_z finz.incr_default finz.mult_default fst snd length];
   simpl length.
 
 Ltac solve_finz_cbn_in_all :=
-  cbn [finz.to_z finz.incr_default fst snd length] in *;
+  cbn [finz.to_z finz.incr_default finz.mult_default fst snd length] in *;
   simpl length in *.
 
 Ltac zify_finz_nonbranching_step :=
@@ -255,6 +331,9 @@ Ltac zify_finz_op_branching_goal_step :=
     finz_incr_as_spec f x
   | |- context [ finz.of_z ?x ] =>
     finz_of_z_as_spec x
+  | |- context [ finz.mult ?f ?x ] =>
+    finz_mult_as_spec f x
+>>>>>>> 1dadb53 (add mult support)
   end.
 
 Ltac zify_finz_op_branching_hyps_step :=
@@ -263,6 +342,8 @@ Ltac zify_finz_op_branching_hyps_step :=
     finz_incr_as_spec f x
   | _ : context [ finz.of_z ?x ] |- _ =>
     finz_of_z_as_spec x
+  | _ : context [ finz.mult ?f ?x ] |- _ =>
+    finz_mult_as_spec f x
   end.
 
 Ltac zify_finz_ty_step_on f :=
@@ -295,8 +376,8 @@ Ltac zify_finz_ty_step :=
    context. Because each (_ + _) introduces a disjunction, the number of goals
    quickly explodes if there are many (_ + _) in the context.
 
-   The solve_addr tactic below is more clever and tries to limit the
-   combinatorial explosion, but zify_addr does not. *)
+   The solve_finz tactic below is more clever and tries to limit the
+   combinatorial explosion, but zify_finz does not. *)
 
 Ltac zify_finz :=
   intros; solve_finz_cbn;
@@ -378,3 +459,12 @@ Goal forall (fb : Z) (f : finz fb) (n m : Z),
   (0 <= m)%Z →
   ((f ^+ n) ^+ m)%f = (f ^+ (n + m)%Z)%f.
 Proof. zify_finz;[]. (* only one goal! *) lia. Qed.
+
+Goal forall fb (f1 f2 : finz fb),
+  (f1 < f2)%Z ->
+  (f2 * 10 = fb)%Z ->
+  is_Some(f1 * 10)%f.
+Proof.
+  intros.
+  solve_finz.
+Qed.
