@@ -15,7 +15,7 @@ Ltac fast_set H v :=
 
 Lemma finz_incr_spec (fb : Z) (f : finz fb) (z : Z) :
   (∃ (f': finz fb),
-   (f + z)%f = Some f' ∧ f + z ≤ fb ∧ 0 ≤ f + z ∧ (f':Z) = f + z)%Z
+   (f + z)%f = Some f' ∧ f + z < fb ∧ 0 ≤ f + z ∧ (f':Z) = f + z)%Z
   ∨
   ((f + z)%f = None ∧ (f + z >= fb ∨ f + z < 0))%Z.
 Proof.
@@ -29,6 +29,48 @@ Ltac finz_incr_as_spec f x :=
   let fx := fresh "fx" in
   fast_set fx (finz.incr f x);
   clearbody fx; subst fx.
+
+(* Non-branching lemma for the special case of an assumption [(a + z) = Some a'],
+   which is common in practice. *)
+Lemma finz_incr_Some_spec fb (f f' : finz fb) (z : Z) :
+  (f + z)%f = Some f' →
+  (f + z < fb ∧ 0 ≤ f + z ∧ (f':Z) = f + z)%Z.
+Proof.
+  unfold finz.incr.
+  destruct (Z_lt_dec (f + z)%Z fb),(Z_le_dec 0%Z (f + z)%Z); inversion 1.
+  repeat split; lia.
+Qed.
+
+Lemma finz_incr_is_Some_spec fb (f : finz fb) (z : Z) :
+  (f + z < fb ∧ 0 ≤ f + z)%Z →
+  is_Some (f + z)%f.
+Proof.
+  unfold finz.incr.
+  destruct (Z_lt_dec (f + z)%Z fb),(Z_le_dec 0%Z (f + z)%Z); eauto; lia.
+Qed.
+
+Lemma finz_incr_Some_prove_spec (fb : Z) (f f' : finz fb) (z: Z) :
+  (f + z < fb ∧ 0 ≤ f + z ∧ (f':Z) = f + z)%Z →
+  (f + z)%f = Some f'.
+Proof.
+  unfold finz.incr.
+  destruct (Z_lt_dec (f + z)%Z fb),(Z_le_dec 0%Z (f + z)%Z); eauto; try lia.
+  intros. apply f_equal. apply finz_to_z_eq. cbn. lia.
+Qed.
+
+Lemma finz_incr_default_spec (fb : Z) (f : finz fb) z :
+  (0%Z ≤ f + z ∧ f + z < fb ∧ ((f ^+ z)%f:Z) = f + z)%Z ∨
+  ((f + z < 0%Z ∨ fb <= f + z) ∧ ((f ^+ z)%f:Z) = finz.largest f)%Z.
+Proof.
+  unfold finz.incr_default, finz.incr, finz.largest.
+  destruct (Z_lt_dec (f + z)%Z fb),(Z_le_dec 0%Z (f + z)%Z); cbn; lia.
+Qed.
+
+Ltac finz_incr_default_as_spec f x :=
+  generalize (finz_incr_default_spec _ f x); intros ?;
+  let fx := fresh "fx" in
+  fast_set fx (finz.incr_default f x);
+  clearbody fx.
 
 Lemma finz_min_spec fb (f1 f2 : finz fb) :
   ∃ f, finz.min f1 f2 = f ∧ (f : Z) = Z.min (f1 : Z) (f2 : Z).
@@ -56,25 +98,6 @@ Ltac finz_max_as_spec f1 f2 :=
   fast_set fx (finz.max f1 f2);
   clearbody fx; subst fx.
 
-(* Non-branching lemma for the special case of an assumption [(a + z) = Some a'],
-   which is common in practice. *)
-Lemma finz_incr_Some_spec fb (f f' : finz fb) (z : Z) :
-  (f + z)%f = Some f' →
-  (f + z < fb ∧ 0 ≤ f + z ∧ (f':Z) = f + z)%Z.
-Proof.
-  unfold finz.incr.
-  destruct (Z_lt_dec (f + z)%Z fb),(Z_le_dec 0%Z (f + z)%Z); inversion 1.
-  repeat split; lia.
-Qed.
-
-Lemma finz_incr_is_Some_spec fb (f : finz fb) (z : Z) :
-  (f + z < fb ∧ 0 ≤ f + z)%Z →
-  is_Some (f + z)%f.
-Proof.
-  unfold finz.incr.
-  destruct (Z_lt_dec (f + z)%Z fb),(Z_le_dec 0%Z (f + z)%Z); eauto; lia.
-Qed.
-
 Lemma finz_largest_spec fb (f : finz fb) :
   finz.to_z (finz.largest f) = (fb - 1)%Z.
 Proof. reflexivity. Qed.
@@ -86,7 +109,7 @@ Ltac finz_largest_as_spec f :=
   clearbody fx.
 
 Lemma finz_of_z_spec fb (z : Z) :
-  (exists (f : finz fb),
+  (∃ (f : finz fb),
     finz.of_z z = Some f ∧ finz.to_z f = z) ∨
   (@finz.of_z fb z = None ∧ (z >= fb ∨ z < 0))%Z.
 Proof.
@@ -172,10 +195,6 @@ Ltac zify_finz_op_nonbranching_step :=
     unfold finz.eqb
   | H : context [ finz.eqb _ _ ] |- _ =>
     unfold finz.eqb in H
-  | H : context [ finz.incr_default _ _ ] |- _ =>
-    unfold finz.incr_default in H
-  | |- context [ finz.incr_default _ _ ] =>
-    unfold finz.incr_default
 
   | H : context [ finz.min ?f1 ?f2 ] |- _ =>
     finz_min_as_spec f1 f2
@@ -191,6 +210,11 @@ Ltac zify_finz_op_nonbranching_step :=
   | |- context [ finz.largest ?f ] =>
     finz_largest_as_spec f
 
+  | H : context [ finz.incr_default ?f ?x ] |- _ =>
+    finz_incr_default_as_spec f x
+  | |- context [ finz.incr_default ?f ?x ] =>
+    finz_incr_default_as_spec f x
+
   | H : is_Some (finz.incr _ _) |- _ =>
     destruct H
   | H : finz.incr _ _ = Some _ |- _ =>
@@ -198,6 +222,8 @@ Ltac zify_finz_op_nonbranching_step :=
     destruct H as (? & ? & ?)
   | |- is_Some (finz.incr _ _) =>
     apply finz_incr_is_Some_spec
+  | |- finz.incr _ _ = Some _ =>
+    apply finz_incr_Some_prove_spec
 
   | H : finz.of_z _ = Some _ |- _ =>
     apply finz_of_z_is_Some_spec in H
@@ -273,6 +299,7 @@ Ltac zify_finz_ty_step :=
    combinatorial explosion, but zify_addr does not. *)
 
 Ltac zify_finz :=
+  intros; solve_finz_cbn;
   repeat (first [ zify_finz_nonbranching_step
                 | zify_finz_op_branching_goal_step
                 | zify_finz_op_branching_hyps_step ]);
@@ -333,11 +360,7 @@ Goal forall fb (a a' b b' : finz fb),
   (a + 0)%f = Some a.
 Proof.
   intros.
-  repeat zify_finz_op_goal_step.
-  (* Check that we can actually terminate early before translating the whole
-     context. *)
-  solve_finz_close_proof.
-  solve_finz_close_proof.
+  repeat zify_finz_op_goal_step; [].
   solve_finz_close_proof.
 Qed.
 
@@ -349,3 +372,9 @@ Goal forall fb (f f' : finz fb),
   (f + 15)%f = Some f' →
   finz.of_z (f + 4) = Some (f ^+ 4)%f.
 Proof. solve_finz. Qed.
+
+Goal forall (fb : Z) (f : finz fb) (n m : Z),
+  (0 <= n)%Z →
+  (0 <= m)%Z →
+  ((f ^+ n) ^+ m)%f = (f ^+ (n + m)%Z)%f.
+Proof. zify_finz;[]. (* only one goal! *) lia. Qed.
