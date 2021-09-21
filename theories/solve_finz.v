@@ -122,7 +122,7 @@ Proof.
 Qed.
 
 Ltac finz_of_z_as_spec z :=
-  generalize (finz_of_z_spec z); intros [[? [? ?]] | [? [?|?]]];
+  generalize (finz_of_z_spec _ z); intros [[? [? ?]] | [? [?|?]]];
   let o := fresh "o" in
   fast_set o (finz.of_z z);
   clearbody o; subst o.
@@ -266,7 +266,7 @@ Ltac zify_finz_op_branching_hyps_step :=
   end.
 
 Ltac zify_finz_ty_step_on f :=
-  generalize (finz_spec _ f); intros [? ?];
+  generalize (finz_spec f); intros [? ?];
   let z := fresh "z" in
   fast_set z (finz.to_z f);
   clearbody z;

@@ -95,7 +95,7 @@ Coercion finz.to_z : finz.finz >-> Z.
 
 Section finz_lemmas.
 
-Context (finz_bound : Z).
+Context {finz_bound : Z}.
 Implicit Type f : finz finz_bound.
 
 Lemma finz_to_z_eq f1 f2 :
@@ -155,10 +155,15 @@ Proof.
   all: lia.
 Qed.
 
-Lemma finz_z_to_addr_eq_inv f1 f2 :
+Lemma finz_of_z_eq_inv f1 f2 :
   finz.of_z (finz.to_z f1) = Some f2 →
   f1 = f2.
 Proof. rewrite finz_of_z_to_z. congruence. Qed.
+
+Lemma finz_incr_eq {f z f'} :
+  (f + z)%f = Some f' →
+  (f ^+ z)%f = f'.
+Proof. rewrite /finz.incr_default. intros ->. done. Qed.
 
 Global Instance finz_countable : Countable (finz finz_bound).
 Proof.
@@ -190,6 +195,18 @@ Proof.
   intros x y. destruct x as [x], y as [y].
   destruct (Z_lt_dec x y); [by left|by right].
 Defined.
+
+Global Instance finz_le_trans : Transitive (@finz.le finz_bound).
+Proof.
+  intros x y z Hxy Hyz. unfold finz.le. trans y;
+  destruct x as [x], y as [y], z as [z]; auto.
+Qed.
+
+Global Instance finz_lt_trans : Transitive (@finz.lt finz_bound).
+Proof.
+  intros x y z Hxy Hyz. unfold finz.lt. trans y;
+  destruct x as [x], y as [y], z as [z]; auto.
+Qed.
 
 Lemma finz_largest_eq f1 f2 : finz.largest f1 = finz.largest f2.
 Proof. by apply finz_to_z_eq. Qed.
