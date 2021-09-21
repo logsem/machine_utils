@@ -104,7 +104,7 @@ Lemma finz_mult_Some_spec fb (f f' : finz fb) (z : Z) :
 Proof.
   unfold finz.mult.
   destruct (Z_lt_dec (f * z)%Z fb),(Z_le_dec 0%Z (f * z)%Z); inversion 1.
- repeat split;try lia.
+  repeat split;try lia.
   destruct (decide (0 < f)%Z).
   - left;lia.
   - right. destruct f. cbn in *. lia.
