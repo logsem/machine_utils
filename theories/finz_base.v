@@ -191,6 +191,12 @@ Lemma finz_incr_eq {f z f'} :
   (f ^+ z)%f = f'.
 Proof. rewrite /finz.incr_default. intros ->. done. Qed.
 
+Lemma finz_mult_eq {f z f'} :
+  (f * z)%f = Some f' →
+  (f ^* z)%f = f'.
+Proof. rewrite /finz.mult_default. intros ->. done. Qed.
+
+
 Global Instance finz_countable : Countable (finz finz_bound).
 Proof.
   refine {| encode r := encode (finz.to_z r) ;

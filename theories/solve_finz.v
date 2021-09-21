@@ -98,46 +98,6 @@ Ltac finz_max_as_spec f1 f2 :=
   fast_set fx (finz.max f1 f2);
   clearbody fx; subst fx.
 
-Lemma finz_mult_spec (fb : Z) (f : finz fb) (z : Z) :
-  (∃ (f': finz fb),
-   (f * z)%f = Some f' ∧ f * z <= fb ∧ (0 < f ∧ 0 <= z ∨ 0= f) ∧ (f':Z) = f * z)%Z
-  ∨
-  ((f * z)%f = None ∧ (f * z >= fb ∨ z < 0))%Z.
-Proof.
-  unfold finz.mult.
-  destruct (Z_lt_dec (f * z)%Z fb),(Z_le_dec 0%Z (f * z)%Z); [ left | right; split; auto; try lia..].
-  eexists.  repeat split. lia.
-  destruct (decide (0< f)%Z).
-  - left;lia.
-  - right. destruct f. cbn in *. lia.
-  - right. destruct f. cbn in *. lia.
-Qed.
-
-Ltac finz_mult_as_spec f x :=
-  generalize (finz_mult_spec _ f x); intros [(?&?&?&[[?  ?]|?]&?)|(?&[?|?])];
-  let fx := fresh "fx" in
-  fast_set fx (finz.mult f x);
-  clearbody fx; subst fx.
-
-(* Non-branching lemma for the special case of an assumption [(a + z) = Some a'],
-   which is common in practice. *)
-Lemma finz_incr_Some_spec fb (f f' : finz fb) (z : Z) :
-  (f + z)%f = Some f' →
-  (f + z < fb ∧ 0 ≤ f + z ∧ (f':Z) = f + z)%Z.
-Proof.
-  unfold finz.incr.
-  destruct (Z_lt_dec (f + z)%Z fb),(Z_le_dec 0%Z (f + z)%Z); inversion 1.
-  repeat split; lia.
-Qed.
-
-Lemma finz_incr_is_Some_spec fb (f : finz fb) (z : Z) :
-  (f + z < fb ∧ 0 ≤ f + z)%Z →
-  is_Some (f + z)%f.
-Proof.
-  unfold finz.incr.
-  destruct (Z_lt_dec (f + z)%Z fb),(Z_le_dec 0%Z (f + z)%Z); eauto; lia.
-Qed.
-
 Lemma finz_mult_Some_spec fb (f f' : finz fb) (z : Z) :
   (f * z)%f = Some f' →
   (f * z < fb ∧ (0 < f ∧ 0 <= z ∨ 0= f) ∧ (f':Z) = f * z)%Z.
@@ -151,11 +111,20 @@ Proof.
 Qed.
 
 Lemma finz_mult_is_Some_spec fb (f : finz fb) (z : Z) :
-  (f * z < fb ∧ (0 < f ∧ 0 <= z ∨ 0= f))%Z →
+  (f * z < fb ∧ (0 < f ∧ 0 <= z ∨ 0 = f))%Z →
   is_Some (f * z)%f.
 Proof.
   unfold finz.mult.
   destruct (Z_lt_dec (f * z)%Z fb),(Z_le_dec 0%Z (f * z)%Z); eauto; try lia.
+Qed.
+
+Lemma finz_mult_Some_prove_spec fb (f f': finz fb) (z : Z) :
+  (f * z < fb ∧ (0 < f ∧ 0 <= z ∨ 0 = f) ∧ (f':Z) = f * z)%Z →
+  (f * z)%f= Some f'.
+Proof.
+  unfold finz.mult.
+  destruct (Z_lt_dec (f * z)%Z fb),(Z_le_dec 0%Z (f * z)%Z); eauto; try lia.
+  intros. apply f_equal. apply finz_to_z_eq. cbn. lia.
 Qed.
 
 Lemma finz_largest_spec fb (f : finz fb) :
@@ -255,14 +224,6 @@ Ltac zify_finz_op_nonbranching_step :=
     unfold finz.eqb
   | H : context [ finz.eqb _ _ ] |- _ =>
     unfold finz.eqb in H
-  | H : context [ finz.incr_default _ _ ] |- _ =>
-    unfold finz.incr_default in H
-  | |- context [ finz.incr_default _ _ ] =>
-    unfold finz.incr_default
-  | H : context [ finz.mult_default _ _ ] |- _ =>
-    unfold finz.mult_default in H
-  | |- context [ finz.mult_default _ _ ] =>
-    unfold finz.mult_default
 
   | H : context [ finz.min ?f1 ?f2 ] |- _ =>
     finz_min_as_spec f1 f2
@@ -293,10 +254,6 @@ Ltac zify_finz_op_nonbranching_step :=
   | |- finz.incr _ _ = Some _ =>
     apply finz_incr_Some_prove_spec
 
-  | H : finz.of_z _ = Some _ |- _ =>
-    apply finz_of_z_is_Some_spec in H
-  | |- finz.of_z _ = Some _ =>
-    apply finz_of_z_Some_spec
   | H : is_Some (finz.mult _ _) |- _ =>
     destruct H
   | H : finz.mult _ _ = Some _ |- _ =>
@@ -304,6 +261,14 @@ Ltac zify_finz_op_nonbranching_step :=
     destruct H as (? & ? & ?)
   | |- is_Some (finz.mult _ _) =>
     apply finz_mult_is_Some_spec
+  | |- finz.mult _ _ = Some _ =>
+    apply finz_mult_Some_prove_spec
+
+
+  | H : finz.of_z _ = Some _ |- _ =>
+    apply finz_of_z_is_Some_spec in H
+  | |- finz.of_z _ = Some _ =>
+    apply finz_of_z_Some_spec
 
   end || zify_finz_op_nonbranching_step_hook.
 
@@ -331,9 +296,6 @@ Ltac zify_finz_op_branching_goal_step :=
     finz_incr_as_spec f x
   | |- context [ finz.of_z ?x ] =>
     finz_of_z_as_spec x
-  | |- context [ finz.mult ?f ?x ] =>
-    finz_mult_as_spec f x
->>>>>>> 1dadb53 (add mult support)
   end.
 
 Ltac zify_finz_op_branching_hyps_step :=
@@ -342,8 +304,6 @@ Ltac zify_finz_op_branching_hyps_step :=
     finz_incr_as_spec f x
   | _ : context [ finz.of_z ?x ] |- _ =>
     finz_of_z_as_spec x
-  | _ : context [ finz.mult ?f ?x ] |- _ =>
-    finz_mult_as_spec f x
   end.
 
 Ltac zify_finz_ty_step_on f :=
