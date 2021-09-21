@@ -435,12 +435,3 @@ Proof.
   intros.
   solve_finz.
 Qed.
-
-Goal forall fb (f1 f2 : finz fb),
-  (f1 < f2)%Z ->
-  (f2 * 10 = fb)%Z ->
-  is_Some(f1 * 10)%f.
-Proof.
-  intros.
-  solve_finz.
-Qed.
