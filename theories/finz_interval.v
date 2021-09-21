@@ -21,7 +21,7 @@ End finz.
 
 Section lemmas.
 
-Context (finz_bound : Z).
+Context {finz_bound : Z}.
 Implicit Types f : finz finz_bound.
 
 (*------------------------- finz_dist ------------------------------*)
