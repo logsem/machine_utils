@@ -73,7 +73,7 @@ Ltac finz_incr_default_as_spec f x :=
   clearbody fx.
 
 Lemma finz_min_spec fb (f1 f2 : finz fb) :
-  ∃ f, finz.min f1 f2 = f ∧ ( f : Z) = Z.min (f1 : Z) (f2 : Z).
+  ∃ f, finz.min f1 f2 = f ∧ (f : Z) = Z.min (f1 : Z) (f2 : Z).
 Proof.
   exists (finz.min f1 f2); split; auto.
   unfold finz.min. case_match. all: unfold finz.leb in *; lia.
@@ -100,12 +100,12 @@ Ltac finz_max_as_spec f1 f2 :=
 
 Lemma finz_mult_Some_spec fb (f f' : finz fb) (z : Z) :
   (f * z)%f = Some f' →
-  (f * z < fb ∧ (0 < f ∧ 0 <= z ∨ 0= f) ∧ (f':Z) = f * z)%Z.
+  (f * z < fb ∧ (0 < f ∧ 0 <= z ∨ 0 = f) ∧ (f':Z) = f * z)%Z.
 Proof.
   unfold finz.mult.
   destruct (Z_lt_dec (f * z)%Z fb),(Z_le_dec 0%Z (f * z)%Z); inversion 1.
- repeat split;try lia...
-  destruct (decide (0< f)%Z).
+ repeat split;try lia.
+  destruct (decide (0 < f)%Z).
   - left;lia.
   - right. destruct f. cbn in *. lia.
 Qed.
@@ -264,19 +264,10 @@ Ltac zify_finz_op_nonbranching_step :=
   | |- finz.mult _ _ = Some _ =>
     apply finz_mult_Some_prove_spec
 
-
   | H : finz.of_z _ = Some _ |- _ =>
     apply finz_of_z_is_Some_spec in H
   | |- finz.of_z _ = Some _ =>
     apply finz_of_z_Some_spec
-
-  | H : is_Some (finz.mult _ _) |- _ =>
-    destruct H
-  | H : finz.mult _ _ = Some _ |- _ =>
-    apply finz_mult_Some_spec in H;
-    destruct H as (? & ? & ?)
-  | |- is_Some (finz.mult _ _) =>
-    apply finz_mult_is_Some_spec
 
   end || zify_finz_op_nonbranching_step_hook.
 
@@ -431,7 +422,7 @@ Proof. zify_finz;[]. (* only one goal! *) lia. Qed.
 Goal forall fb (f1 f2 : finz fb),
   (f1 < f2)%Z ->
   (f2 * 10 = fb)%Z ->
-  is_Some(f1 * 10)%f.
+  is_Some (f1 * 10)%f.
 Proof.
   intros.
   solve_finz.

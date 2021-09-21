@@ -72,7 +72,7 @@ Definition incr_default (f : finz) (off : Z) : finz :=
   | None => largest f
   end.
 
-Program Definition mult(f : finz) (off : Z) : option finz :=
+Program Definition mult (f : finz) (off : Z) : option finz :=
   let z := (to_z f * off)%Z in
   match (Z_lt_dec z finz_bound) with
   | left _ =>
