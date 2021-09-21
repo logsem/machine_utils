@@ -72,6 +72,29 @@ Definition incr_default (f : finz) (off : Z) : finz :=
   | None => largest f
   end.
 
+Program Definition mult (f : finz) (off : Z) : option finz :=
+  let z := (to_z f * off)%Z in
+  match (Z_lt_dec z finz_bound) with
+  | left _ =>
+    match (Z_le_dec 0%Z z) with
+    | left _ => Some (FinZ z _ _)
+    | right _ => None
+    end
+  | right _ => None
+  end.
+Next Obligation.
+  intros. apply Z.ltb_lt; auto.
+Defined.
+Next Obligation.
+  intros. apply Z.leb_le; auto.
+Defined.
+
+Definition mult_default (f : finz) (off : Z) : finz :=
+  match mult f off with
+  | Some f' => f'
+  | None => largest f
+  end.
+
 End finz.
 End finz.
 
@@ -89,6 +112,9 @@ Notation "f1 <? f2" := (finz.ltb f1 f2) : finz_scope.
 Notation "f1 =? f2" := (finz.eqb f1 f2) : finz_scope.
 Notation "f1 + z" := (finz.incr f1 z) : finz_scope.
 Notation "f ^+ off" := (finz.incr_default f off) (at level 50) : finz_scope.
+Notation "f ^- off" := (finz.incr_default f (-off)%Z) (at level 51) : finz_scope.
+Notation "f * z" := (finz.mult f z) : finz_scope.
+Notation "f ^* z" := (finz.mult_default f z) (at level 50) : finz_scope.
 
 Coercion finz.to_z : finz.finz >-> Z.
 
@@ -164,6 +190,12 @@ Lemma finz_incr_eq {f z f'} :
   (f + z)%f = Some f' →
   (f ^+ z)%f = f'.
 Proof. rewrite /finz.incr_default. intros ->. done. Qed.
+
+Lemma finz_mult_eq {f z f'} :
+  (f * z)%f = Some f' →
+  (f ^* z)%f = f'.
+Proof. rewrite /finz.mult_default. intros ->. done. Qed.
+
 
 Global Instance finz_countable : Countable (finz finz_bound).
 Proof.
