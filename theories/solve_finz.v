@@ -270,6 +270,14 @@ Ltac zify_finz_op_nonbranching_step :=
   | |- finz.of_z _ = Some _ =>
     apply finz_of_z_Some_spec
 
+  | H : is_Some (finz.mult _ _) |- _ =>
+    destruct H
+  | H : finz.mult _ _ = Some _ |- _ =>
+    apply finz_mult_Some_spec in H;
+    destruct H as (? & ? & ?)
+  | |- is_Some (finz.mult _ _) =>
+    apply finz_mult_is_Some_spec
+
   end || zify_finz_op_nonbranching_step_hook.
 
 (* We need some reduction, but naively calling "cbn in *" causes performance
@@ -302,7 +310,6 @@ Ltac zify_finz_op_branching_hyps_step :=
   lazymatch goal with
   | _ : context [ finz.incr ?f ?x ] |- _ =>
     finz_incr_as_spec f x
-  | _ : context [ finz.of_z ?x ] |- _ =>
     finz_of_z_as_spec x
   end.
 
@@ -419,6 +426,15 @@ Goal forall (fb : Z) (f : finz fb) (n m : Z),
   (0 <= m)%Z →
   ((f ^+ n) ^+ m)%f = (f ^+ (n + m)%Z)%f.
 Proof. zify_finz;[]. (* only one goal! *) lia. Qed.
+
+Goal forall fb (f1 f2 : finz fb),
+  (f1 < f2)%Z ->
+  (f2 * 10 = fb)%Z ->
+  is_Some(f1 * 10)%f.
+Proof.
+  intros.
+  solve_finz.
+Qed.
 
 Goal forall fb (f1 f2 : finz fb),
   (f1 < f2)%Z ->
