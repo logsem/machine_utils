@@ -137,6 +137,16 @@ Ltac finz_largest_as_spec f :=
   fast_set fx (finz.largest f);
   clearbody fx.
 
+Lemma finz_zero_spec fb (f : finz fb) :
+  finz.to_z (finz.zero f) = 0%Z.
+Proof. reflexivity. Qed.
+
+Ltac finz_zero_as_spec f :=
+  generalize (finz_zero_spec _ f); intros ?;
+  let fx := fresh "fx" in
+  fast_set fx (finz.zero f);
+  clearbody fx.
+
 Lemma finz_of_z_spec fb (z : Z) :
   (∃ (f : finz fb),
     finz.of_z z = Some f ∧ finz.to_z f = z) ∨
@@ -238,6 +248,11 @@ Ltac zify_finz_op_nonbranching_step :=
     finz_largest_as_spec f
   | |- context [ finz.largest ?f ] =>
     finz_largest_as_spec f
+
+  | H : context [ finz.zero ?f ] |- _ =>
+    finz_zero_as_spec f
+  | |- context [ finz.zero ?f ] =>
+    finz_zero_as_spec f
 
   | H : context [ finz.incr_default ?f ?x ] |- _ =>
     finz_incr_default_as_spec f x

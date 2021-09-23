@@ -66,6 +66,11 @@ Program Definition largest (ex: finz) : finz :=
 Next Obligation. lia. Defined.
 Next Obligation. inversion 1. lia. Defined.
 
+Program Definition zero (ex: finz) : finz :=
+  FinZ 0 _ _.
+Next Obligation. inversion 1. lia. Defined.
+Next Obligation. lia. Defined.
+
 Definition incr_default (f : finz) (off : Z) : finz :=
   match incr f off with
   | Some f' => f'
@@ -241,6 +246,9 @@ Proof.
 Qed.
 
 Lemma finz_largest_eq f1 f2 : finz.largest f1 = finz.largest f2.
+Proof. by apply finz_to_z_eq. Qed.
+
+Lemma finz_zero_eq f1 f2 : finz.zero f1 = finz.zero f2.
 Proof. by apply finz_to_z_eq. Qed.
 
 End finz_lemmas.
