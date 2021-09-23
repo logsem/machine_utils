@@ -7,3 +7,7 @@ theories/solve_finz.v
 theories/finz_lemmas.v
 theories/finz_interval.v
 theories/finz.v
+theories/classes.v
+theories/class_instances.v
+theories/solve_pure.v
+theories/tactics.v

@@ -190,6 +190,9 @@ Proof. congruence. Qed.
 Ltac zify_finz_op_nonbranching_step_hook :=
   fail.
 
+Ltac without_evars c :=
+  (has_evar c; fail 1) || idtac.
+
 Ltac zify_finz_op_nonbranching_step :=
   lazymatch goal with
   | |- @eq (finz _) ?f ?f' =>
@@ -234,6 +237,16 @@ Ltac zify_finz_op_nonbranching_step :=
     unfold finz.eqb
   | H : context [ finz.eqb _ _ ] |- _ =>
     unfold finz.eqb in H
+  | H : ContiguousRegion _ _ |- _ => unfold ContiguousRegion in H
+  | |- ContiguousRegion _ _ => unfold ContiguousRegion
+  | H : SubBounds _ _ _ _ |- _ => unfold SubBounds in H
+  | |- SubBounds ?b ?e ?b' ?e' =>
+    without_evars b; without_evars e; without_evars b'; without_evars e';
+    unfold SubBounds
+  | H : InBounds _ _ _ |- _ => unfold InBounds in H
+  | |- InBounds ?b ?e ?a =>
+    without_evars b; without_evars e; without_evars a;
+    unfold InBounds
 
   | H : context [ finz.min ?f1 ?f2 ] |- _ =>
     finz_min_as_spec f1 f2

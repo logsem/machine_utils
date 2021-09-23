@@ -10,6 +10,12 @@ Lemma finz_add_0_default fb (a : finz fb) :
   (a ^+ 0)%f = a.
 Proof. solve_finz. Qed.
 
+Lemma InBounds_sub fb (b e b' e' a : finz fb) :
+  SubBounds b e b' e' →
+  InBounds b' e' a →
+  InBounds b e a.
+Proof. intros (? & ? & ?) [? ?]. unfold InBounds. solve_finz. Qed.
+
 (* -- tests -- promote to lemmas if needed *)
 
 Goal forall fb (a : finz fb),

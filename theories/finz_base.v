@@ -123,6 +123,18 @@ Notation "f ^* z" := (finz.mult_default f z) (at level 50) : finz_scope.
 
 Coercion finz.to_z : finz.finz >-> Z.
 
+(* derived notions to reason specifically about ranges of contiguous addresses,
+   with support for more restricted but more lightweight automation (as provided
+   by [solve_pure]). *)
+Definition ContiguousRegion {fb} (f : finz fb) (z : Z) : Prop :=
+  is_Some (f + z)%f.
+
+Definition SubBounds {fb} (b e : finz fb) (b' e' : finz fb) :=
+  (b <= b')%f ∧ (b' <= e')%f ∧ (e' <= e)%f.
+
+Definition InBounds {fb} (b e f : finz fb):=
+  (b <= f)%f ∧ (f < e)%f.
+
 
 Section finz_lemmas.
 
