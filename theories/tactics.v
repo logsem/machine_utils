@@ -101,6 +101,7 @@ Ltac iFrameAuto := ltac2:(iFrameAuto' ()).
 (******************************************************************************)
 (* iFrameAutoSolve: multi-goal [iFrameAuto || solve_pure] *)
 
+(* multi-goal repeat *)
 Ltac2 rec grepeat (t: unit -> unit) :=
   ifcatch (fun _ => Control.progress t)
     (fun _ => Control.check_interrupt (); grepeat t) (fun _ => ()).
