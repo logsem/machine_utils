@@ -184,7 +184,11 @@ Proof using.
   set n := Z.to_nat (e - b). have: (n = Z.to_nat (e - b)) by reflexivity.
   clearbody n. revert n a b e. induction n.
   { intros. cbn. rewrite elem_of_nil. solve_finz. }
-  { intros. cbn. rewrite elem_of_cons (IHn a _ e). solve_finz.
+  { intros. cbn. rewrite elem_of_cons (IHn a _ e)
+    ; try
+        (match goal with
+          | h: _ |- ( _ = Z.to_nat _ ) => solve_finz
+          end ).
     split. intros [ -> | ]; solve_finz. intros [Hba ?].
     apply Zle_lt_or_eq in Hba. destruct Hba; [| subst]. solve_finz.
     assert (b = a) by solve_finz. subst. solve_finz. }
