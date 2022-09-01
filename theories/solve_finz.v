@@ -20,7 +20,7 @@ Lemma finz_incr_spec (fb : Z) (f : finz fb) (z : Z) :
   ((f + z)%f = None ∧ (f + z >= fb ∨ f + z < 0))%Z.
 Proof.
   unfold finz.incr.
-  destruct (Z_lt_dec (f + z)%Z fb),(Z_le_dec 0%Z (f + z)%Z); [ left | right; split; auto; try lia..].
+  destruct (Z.lt_dec (f + z)%Z fb),(Z.le_dec 0%Z (f + z)%Z); [ left | right; split; auto; try lia..].
   eexists. repeat split; lia.
 Qed.
 
@@ -37,7 +37,7 @@ Lemma finz_incr_Some_spec fb (f f' : finz fb) (z : Z) :
   (f + z < fb ∧ 0 ≤ f + z ∧ (f':Z) = f + z)%Z.
 Proof.
   unfold finz.incr.
-  destruct (Z_lt_dec (f + z)%Z fb),(Z_le_dec 0%Z (f + z)%Z); inversion 1.
+  destruct (Z.lt_dec (f + z)%Z fb),(Z.le_dec 0%Z (f + z)%Z); inversion 1.
   repeat split; lia.
 Qed.
 
@@ -46,7 +46,7 @@ Lemma finz_incr_is_Some_spec fb (f : finz fb) (z : Z) :
   is_Some (f + z)%f.
 Proof.
   unfold finz.incr.
-  destruct (Z_lt_dec (f + z)%Z fb),(Z_le_dec 0%Z (f + z)%Z); eauto; lia.
+  destruct (Z.lt_dec (f + z)%Z fb),(Z.le_dec 0%Z (f + z)%Z); eauto; lia.
 Qed.
 
 Lemma finz_incr_Some_prove_spec (fb : Z) (f f' : finz fb) (z: Z) :
@@ -54,7 +54,7 @@ Lemma finz_incr_Some_prove_spec (fb : Z) (f f' : finz fb) (z: Z) :
   (f + z)%f = Some f'.
 Proof.
   unfold finz.incr.
-  destruct (Z_lt_dec (f + z)%Z fb),(Z_le_dec 0%Z (f + z)%Z); eauto; try lia.
+  destruct (Z.lt_dec (f + z)%Z fb),(Z.le_dec 0%Z (f + z)%Z); eauto; try lia.
   intros. apply f_equal. apply finz_to_z_eq. cbn. lia.
 Qed.
 
@@ -63,7 +63,7 @@ Lemma finz_incr_default_spec (fb : Z) (f : finz fb) z :
   ((f + z < 0%Z ∨ fb <= f + z) ∧ ((f ^+ z)%f:Z) = finz.largest f)%Z.
 Proof.
   unfold finz.incr_default, finz.incr, finz.largest.
-  destruct (Z_lt_dec (f + z)%Z fb),(Z_le_dec 0%Z (f + z)%Z); cbn; lia.
+  destruct (Z.lt_dec (f + z)%Z fb),(Z.le_dec 0%Z (f + z)%Z); cbn; lia.
 Qed.
 
 Ltac finz_incr_default_as_spec f x :=
@@ -103,7 +103,7 @@ Lemma finz_mult_Some_spec fb (f f' : finz fb) (z : Z) :
   (f * z < fb ∧ (0 < f ∧ 0 <= z ∨ 0 = f) ∧ (f':Z) = f * z)%Z.
 Proof.
   unfold finz.mult.
-  destruct (Z_lt_dec (f * z)%Z fb),(Z_le_dec 0%Z (f * z)%Z); inversion 1.
+  destruct (Z.lt_dec (f * z)%Z fb),(Z.le_dec 0%Z (f * z)%Z); inversion 1.
   repeat split;try lia.
   destruct (decide (0 < f)%Z).
   - left;lia.
@@ -115,7 +115,7 @@ Lemma finz_mult_is_Some_spec fb (f : finz fb) (z : Z) :
   is_Some (f * z)%f.
 Proof.
   unfold finz.mult.
-  destruct (Z_lt_dec (f * z)%Z fb),(Z_le_dec 0%Z (f * z)%Z); eauto; try lia.
+  destruct (Z.lt_dec (f * z)%Z fb),(Z.le_dec 0%Z (f * z)%Z); eauto; try lia.
 Qed.
 
 Lemma finz_mult_Some_prove_spec fb (f f': finz fb) (z : Z) :
@@ -123,7 +123,7 @@ Lemma finz_mult_Some_prove_spec fb (f f': finz fb) (z : Z) :
   (f * z)%f= Some f'.
 Proof.
   unfold finz.mult.
-  destruct (Z_lt_dec (f * z)%Z fb),(Z_le_dec 0%Z (f * z)%Z); eauto; try lia.
+  destruct (Z.lt_dec (f * z)%Z fb),(Z.le_dec 0%Z (f * z)%Z); eauto; try lia.
   intros. apply f_equal. apply finz_to_z_eq. cbn. lia.
 Qed.
 
@@ -153,11 +153,11 @@ Lemma finz_of_z_spec fb (z : Z) :
   (@finz.of_z fb z = None ∧ (z >= fb ∨ z < 0))%Z.
 Proof.
   unfold finz.of_z.
-  destruct (Z_lt_dec z fb).
-  { destruct (Z_le_dec 0%Z z).
+  destruct (Z.lt_dec z fb).
+  { destruct (Z.le_dec 0%Z z).
     { left. eexists. split; auto. }
     { right; split; auto; lia. } }
-  { right. destruct (Z_le_dec 0%Z z); split; auto; lia. }
+  { right. destruct (Z.le_dec 0%Z z); split; auto; lia. }
 Qed.
 
 Ltac finz_of_z_as_spec z :=

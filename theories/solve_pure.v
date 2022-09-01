@@ -98,12 +98,12 @@ Lemma ContiguousRegion_InCtx fb (f : finz fb) z :
 Proof. auto. Qed.
 #[export] Hint Resolve ContiguousRegion_InCtx : solve_pure.
 
-Instance IncrFinZ_of_ContiguousRegion fb (f : finz fb) z :
+#[global] Instance IncrFinZ_of_ContiguousRegion fb (f : finz fb) z :
   ContiguousRegion f z →
   IncrFinZ f z (f ^+ z)%f.
 Proof. intros [? ?]. unfold IncrFinZ. solve_finz. Qed.
 
-Instance IncrFinZ_in_ContiguousRegion fb (a a' : finz fb) (z o z' z'': Z) :
+#[global] Instance IncrFinZ_in_ContiguousRegion fb (a a' : finz fb) (z o z' z'': Z) :
   AsWeakFinZIncr a' a z →
   ContiguousRegion a z'' →
   CbvTC (z + o)%Z z' →
@@ -135,17 +135,17 @@ Proof. auto. Qed.
 (* TODO: figure out if these hints are actually exercised *)
 (* TODO: change these hints to lookup a SubBounds in the local context only *)
 
-Instance SubBounds_le_b_b' fb (b e b' e' : finz fb) :
+#[global] Instance SubBounds_le_b_b' fb (b e b' e' : finz fb) :
   SubBounds b e b' e' →
   FinZLe b b'.
 Proof. unfold SubBounds, FinZLe. solve_finz. Qed.
 
-Instance SubBounds_le_b'_e' fb (b e b' e' : finz fb) :
+#[global] Instance SubBounds_le_b'_e' fb (b e b' e' : finz fb) :
   SubBounds b e b' e' →
   FinZLe b' e'.
 Proof. unfold SubBounds, FinZLe. solve_finz. Qed.
 
-Instance SubBounds_le_e_e' fb (b e b' e' : finz fb) :
+#[global] Instance SubBounds_le_e_e' fb (b e b' e' : finz fb) :
   SubBounds b e b' e' →
   FinZLe e' e.
 Proof. unfold SubBounds, FinZLe. solve_finz. Qed.
@@ -154,24 +154,24 @@ Proof. unfold SubBounds, FinZLe. solve_finz. Qed.
 (* Manually insert the transitive consequences from above, as we don't want to
    have general transitivity instances for FinZLe/FinZLt *)
 
-Instance SubBounds_le_b_e' fb (b e b' e' : finz fb) :
+#[global] Instance SubBounds_le_b_e' fb (b e b' e' : finz fb) :
   SubBounds b e b' e' →
   FinZLe b e'.
 Proof. unfold SubBounds, FinZLe. solve_finz. Qed.
 
-Instance SubBounds_le_b_e fb (b e b' e' : finz fb) :
+#[global] Instance SubBounds_le_b_e fb (b e b' e' : finz fb) :
   SubBounds b e b' e' →
   FinZLe b e.
 Proof. unfold SubBounds, FinZLe. solve_finz. Qed.
 
-Instance SubBounds_le_b'_e fb (b e b' e' : finz fb) :
+#[global] Instance SubBounds_le_b'_e fb (b e b' e' : finz fb) :
   SubBounds b e b' e' →
   FinZLe b' e.
 Proof. unfold SubBounds, FinZLe. solve_finz. Qed.
 
 (* transitivity to deduce lt of the outer bounds from lt of the inner bounds *)
 
-Instance SubBounds_lt_of_inner fb (b e b' e' : finz fb):
+#[global] Instance SubBounds_lt_of_inner fb (b e b' e' : finz fb):
   SubBounds b e b' e' →
   FinZLt b' e' →
   FinZLt b e.
@@ -202,7 +202,7 @@ Proof.
 Qed.
 #[export] Hint Resolve IncrFinZ_prove : solve_pure.
 
-Instance IncrFinZ_InCtx fb (a : finz fb) z a' :
+#[global] Instance IncrFinZ_InCtx fb (a : finz fb) z a' :
   InCtx ((a + z)%f = Some a') → IncrFinZ a z a'.
 Proof. auto. Qed.
 

@@ -164,9 +164,9 @@ Qed.
 Lemma finz_seq_between_NoDup f1 f2 :
   NoDup (finz.seq_between f1 f2).
 Proof using.
-  rewrite /finz.seq_between. destruct (Z_le_dec f1 f2).
+  rewrite /finz.seq_between. destruct (Z.le_dec f1 f2).
   { apply finz_seq_NoDup. unfold finz.dist; solve_finz. }
-  { rewrite /finz.dist Z_to_nat_nonpos. lia. apply NoDup_nil_2. }
+  { rewrite /finz.dist Z2Nat.nonpos. lia. apply NoDup_nil_2. }
 Qed.
 
 Lemma finz_seq_between_cons f1 f2 :

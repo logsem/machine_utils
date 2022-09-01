@@ -13,7 +13,7 @@ From machine_utils Require Import finz classes.
 
 (* Address manipulation *)
 
-Instance FinZOffsetLe_refl z : FinZOffsetLe z z.
+#[global] Instance FinZOffsetLe_refl z : FinZOffsetLe z z.
 Proof. apply Z.le_refl. Qed.
 
 Lemma FinZOffsetLe_compute z z' : (z <=? z' = true)%Z -> FinZOffsetLe z z'.
@@ -24,24 +24,24 @@ Lemma FinZOffsetLt_compute z z' : (z <? z' = true)%Z -> FinZOffsetLt z z'.
 Proof. intro. apply Z.ltb_lt; auto. Qed.
 #[export] Hint Extern 1 (FinZOffsetLt _ _) => (apply FinZOffsetLt_compute; reflexivity) : typeclass_instances.
 
-Instance FinZOffsetLe_of_lt z z' : FinZOffsetLt z z' → FinZOffsetLe z z'.
+#[global] Instance FinZOffsetLe_of_lt z z' : FinZOffsetLt z z' → FinZOffsetLe z z'.
 Proof. unfold FinZOffsetLt, FinZOffsetLe. lia. Qed.
 
-Instance AsWeakFinZIncr_incr fb (b : finz fb) z:
+#[global] Instance AsWeakFinZIncr_incr fb (b : finz fb) z:
   AsWeakFinZIncr (b ^+ z)%f b z.
 Proof. reflexivity. Qed.
 
-Instance AsWeakFinZIncr_no_incr fb (b : finz fb):
+#[global] Instance AsWeakFinZIncr_no_incr fb (b : finz fb):
   AsWeakFinZIncr b b 0 | 50.
 Proof. unfold AsWeakFinZIncr. solve_finz. Qed.
 
-Instance FinZLe_refl fb (a : finz fb) : FinZLe a a.
+#[global] Instance FinZLe_refl fb (a : finz fb) : FinZLe a a.
 Proof. unfold FinZLe. solve_finz. Qed.
 
-Instance FinZLe_of_lt fb (a a' : finz fb) : FinZLt a a' → FinZLe a a'.
+#[global] Instance FinZLe_of_lt fb (a a' : finz fb) : FinZLt a a' → FinZLe a a'.
 Proof. unfold FinZLt, FinZLe. solve_finz. Qed.
 
-Instance FinZLe_offsets fb (a a' a'' : finz fb) (z z': Z) :
+#[global] Instance FinZLe_offsets fb (a a' a'' : finz fb) (z z': Z) :
   AsWeakFinZIncr a' a z →
   AsWeakFinZIncr a'' a z' →
   FinZOffsetLe 0%Z z →
@@ -49,7 +49,7 @@ Instance FinZLe_offsets fb (a a' a'' : finz fb) (z z': Z) :
   FinZLe a' a''.
 Proof. unfold FinZOffsetLe, FinZLe, AsWeakFinZIncr. solve_finz. Qed.
 
-Instance FinZLt_offsets fb (a a' a'': finz fb) (z z': Z) :
+#[global]Instance FinZLt_offsets fb (a a' a'': finz fb) (z z': Z) :
   AsWeakFinZIncr a' a z →
   AsWeakFinZIncr a'' a z' →
   FinZOffsetLe 0 z →
@@ -61,18 +61,18 @@ Proof.
   intros ? ? ? [? ?] ?. solve_finz.
 Qed.
 
-Instance FinZEqSame fb (f : finz fb) : FinZEq f f true.
+#[global] Instance FinZEqSame fb (f : finz fb) : FinZEq f f true.
 Proof. constructor. Qed.
 
-Instance FinZEq_offset_cbv fb (b : finz fb) z z' :
+#[global] Instance FinZEq_offset_cbv fb (b : finz fb) z z' :
   CbvTC z z' →
   FinZEq (b ^+ z)%f (b ^+ z')%f true.
 Proof. intros ->. constructor. Qed.
 
-Instance FinZEq_default_neq fb (a a' : finz fb) : FinZEq a a' false | 100.
+#[global] Instance FinZEq_default_neq fb (a a' : finz fb) : FinZEq a a' false | 100.
 Proof. inversion 1. Qed.
 
-Instance ZToFinZ_z_of fb (a : finz fb) :
+#[global] Instance ZToFinZ_z_of fb (a : finz fb) :
   ZToFinZ (finz.to_z a) a.
 Proof. apply finz_of_z_to_z. Qed.
 

@@ -18,11 +18,11 @@ Class FramableMachineResource {Σ: gFunctors} (P: iProp Σ) := {}.
 Class EnvsLookupSpatial {PROP: bi} (Δ: envs PROP) (P: PROP) (i: ident) := {}.
 #[export] Hint Mode EnvsLookupSpatial + ! ! - : typeclass_instances.
 
-Instance EnvsLookupSpatial_here (PROP: bi) (Γp Γs: env PROP) P c i :
+#[global] Instance EnvsLookupSpatial_here (PROP: bi) (Γp Γs: env PROP) P c i :
   EnvsLookupSpatial (Envs Γp (Esnoc Γs i P) c) P i.
 Qed.
 
-Instance EnvsLookupSpatial_next (PROP: bi) (Γp Γs: env PROP) P Q c i j :
+#[global] Instance EnvsLookupSpatial_next (PROP: bi) (Γp Γs: env PROP) P Q c i j :
   EnvsLookupSpatial (Envs Γp Γs c) Q j →
   EnvsLookupSpatial (Envs Γp (Esnoc Γs i P) c) Q j.
 Qed.
@@ -30,32 +30,32 @@ Qed.
 Class LookupFramableMachineResource {Σ: gFunctors} (G: iProp Σ) (P: iProp Σ) := {}.
 #[export] Hint Mode LookupFramableMachineResource + ! - : typeclass_instances.
 
-Instance LookupFramableMachineResource_framable Σ (P: iProp Σ) :
+#[global] Instance LookupFramableMachineResource_framable Σ (P: iProp Σ) :
   FramableMachineResource P →
   LookupFramableMachineResource P P.
 Qed.
 
 (* TODO: use [TCOr] instead of the two instances below? *)
-Instance LookupFramableMachineResource_sep_l Σ (G1 G2 P: iProp Σ) :
+#[global] Instance LookupFramableMachineResource_sep_l Σ (G1 G2 P: iProp Σ) :
   LookupFramableMachineResource G1 P →
   LookupFramableMachineResource (G1 ∗ G2)%I P
 | 5.
 Qed.
 
-Instance LookupFramableMachineResource_sep_r Σ (G1 G2 P: iProp Σ) :
+#[global] Instance LookupFramableMachineResource_sep_r Σ (G1 G2 P: iProp Σ) :
   LookupFramableMachineResource G2 P →
   LookupFramableMachineResource (G1 ∗ G2)%I P
 | 6. (* start looking left *)
 Qed.
 
-Instance LookupFramableMachineResource_later Σ (G P: iProp Σ) :
+#[global] Instance LookupFramableMachineResource_later Σ (G P: iProp Σ) :
   LookupFramableMachineResource G P →
   LookupFramableMachineResource (▷ G)%I P.
 Qed.
 
 Class FramableMachineHyp {Σ} (Δ: envs (uPredI (iResUR Σ))) (G: iProp Σ) (i: ident) := {}.
 #[export] Hint Mode FramableMachineHyp + ! ! - : typeclass_instances.
-Instance FramableMachineHyp_default Σ (Δ: envs (uPredI (iResUR Σ))) G P i:
+#[global] Instance FramableMachineHyp_default Σ (Δ: envs (uPredI (iResUR Σ))) G P i:
   LookupFramableMachineResource G P →
   EnvsLookupSpatial Δ P i →
   FramableMachineHyp Δ G i.
