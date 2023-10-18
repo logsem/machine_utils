@@ -338,7 +338,7 @@ Ltac zify_finz_ty_step_on f :=
   let z := fresh "z" in
   fast_set z (finz.to_z f);
   clearbody z;
-  first [ clear f | revert dependent f ].
+  first [ clear f | generalize dependent f ].
 
 Ltac zify_finz_ty_step_var :=
   lazymatch goal with
