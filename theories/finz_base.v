@@ -174,9 +174,9 @@ Qed.
 
 Global Instance finz_eq_dec : EqDecision (finz finz_bound).
 Proof.
-  intros x y. destruct x as [x],y as [y]. destruct (Z_eq_dec x y).
-  - left. eapply finz_to_z_eq; eauto.
+  intros x y. destruct x as [x],y as [y]. destruct (Z_noteq_dec x y).
   - right. inversion 1. simplify_eq.
+  - left. eapply finz_to_z_eq; eauto.
 Defined.
 
 Lemma finz_spec f :
