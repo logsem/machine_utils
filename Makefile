@@ -11,7 +11,7 @@ export COQDOCFLAGS
 all: coq
 
 coq: Makefile.coq
-	$(MAKE) -f Makefile.coq pretty-timed
+	$(MAKE) -f Makefile.coq
 
 html: Makefile.coq
 	rm -rf html
@@ -30,7 +30,7 @@ skip-qed: Makefile.coq.conf
 	./disable-qed.sh $(COQMF_VFILES)
 
 ci: skip-qed
-	$(MAKE) -f Makefile.coq pretty-timed
+	$(MAKE) -f Makefile.coq
 
 clean: Makefile.coq
 	$(MAKE) -f Makefile.coq clean
