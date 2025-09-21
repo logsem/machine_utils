@@ -10,10 +10,16 @@ export ROCQDOCFLAGS
 .PHONY: all rocq clean html
 all: rocq
 
-# rocq: Makefile.rocq
-# 	$(MAKE) -f Makefile.rocq
-rocq:
-	dune build
+%: Makefile.rocq phony
+	@#echo "Forwarding $@"
+	+@$(MAKE) -f Makefile.rocq $@
+phony: ;
+
+
+rocq: Makefile.rocq
+	$(MAKE) -f Makefile.rocq
+# rocq:
+# 	dune build
 
 html: Makefile.rocq
 	rm -rf html
