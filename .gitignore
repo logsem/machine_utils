@@ -12,7 +12,7 @@
 *.fuse_*
 *~
 *.log
-.coqdeps.d
-Makefile.coq
-Makefile.coq.conf
-.Makefile.coq.d
+.rocqdeps.d
+Makefile.rocq
+Makefile.rocq.conf
+.Makefile.rocq.d

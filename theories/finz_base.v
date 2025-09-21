@@ -1,4 +1,4 @@
-From Coq Require Import Eqdep_dec ssreflect ZArith.
+From Stdlib Require Import Eqdep_dec ssreflect ZArith.
 From stdpp Require Import base numbers countable.
 
 Module finz.

@@ -1,38 +1,38 @@
 EXTRA_DIR:=extra
-COQDOCFLAGS:= \
+ROCQDOCFLAGS:= \
   --external 'http://ssr2.msr-inria.inria.fr/doc/ssreflect-1.5/' Ssreflect \
   --external 'http://ssr2.msr-inria.inria.fr/doc/mathcomp-1.5/' MathComp \
   --toc --toc-depth 2 --html --interpolate \
   --index indexpage --no-lib-name --parse-comments \
   --with-header $(EXTRA_DIR)/header.html --with-footer $(EXTRA_DIR)/footer.html
-export COQDOCFLAGS
+export ROCQDOCFLAGS
 
-.PHONY: all coq clean html
-all: coq
+.PHONY: all rocq clean html
+all: rocq
 
-coq: Makefile.coq
-	$(MAKE) -f Makefile.coq pretty-timed
+rocq: Makefile.rocq
+	$(MAKE) -f Makefile.rocq
 
-html: Makefile.coq
+html: Makefile.rocq
 	rm -rf html
-	$(MAKE) -f Makefile.coq html
+	$(MAKE) -f Makefile.rocq html
 	cp $(EXTRA_DIR)/resources/* html
 
-Makefile.coq:
-	coq_makefile -f _CoqProject -o Makefile.coq
+Makefile.rocq:
+	rocq makefile -f _RocqProject -o Makefile.rocq
 
-Makefile.coq.conf:
-	coq_makefile -f _CoqProject -o Makefile.coq
+Makefile.rocq.conf:
+	rocq makefile -f _RocqProject -o Makefile.rocq
 
-include Makefile.coq.conf
+include Makefile.rocq.conf
 
-skip-qed: Makefile.coq.conf
-	./disable-qed.sh $(COQMF_VFILES)
+skip-qed: Makefile.rocq.conf
+	./disable-qed.sh $(ROCQMF_VFILES)
 
 ci: skip-qed
-	$(MAKE) -f Makefile.coq pretty-timed
+	$(MAKE) -f Makefile.rocq pretty-timed
 
-clean: Makefile.coq
-	$(MAKE) -f Makefile.coq clean
-	rm -f Makefile.coq
+clean: Makefile.rocq
+	$(MAKE) -f Makefile.rocq clean
+	rm -f Makefile.rocq
 	rm -rf html

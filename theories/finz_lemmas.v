@@ -1,4 +1,4 @@
-From Coq Require Import ssreflect.
+From Stdlib Require Import ssreflect.
 From stdpp Require Import base numbers.
 From machine_utils Require Import finz_base solve_finz.
 

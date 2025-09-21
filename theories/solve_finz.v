@@ -1,4 +1,4 @@
-From Coq Require Import ZArith Lia.
+From Stdlib Require Import ZArith Lia.
 From stdpp Require Import list.
 From machine_utils Require Import finz_base.
 

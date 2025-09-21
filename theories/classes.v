@@ -1,4 +1,4 @@
-From Coq Require Import ZArith.
+From Stdlib Require Import ZArith.
 From stdpp Require Import base option.
 From machine_utils Require Import finz.
 

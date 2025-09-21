@@ -1,4 +1,4 @@
-From Coq Require Import ZArith Lia ssreflect.
+From Stdlib Require Import ZArith Lia ssreflect.
 From stdpp Require Import base.
 From machine_utils Require Import finz classes class_instances.
 
