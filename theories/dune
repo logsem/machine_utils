@@ -1,0 +1,12 @@
+(include_subdirs qualified)
+
+(coq.theory
+ (name machine_utils)
+ (package machine_utils)
+ (flags :standard
+        -w -convert_concl_no_check
+        -w -several-object-files
+        -w -ssr-search-moved
+ )
+ (theories stdpp iris Ltac2 Stdlib)
+)

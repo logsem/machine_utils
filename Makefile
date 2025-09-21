@@ -10,8 +10,10 @@ export ROCQDOCFLAGS
 .PHONY: all rocq clean html
 all: rocq
 
-rocq: Makefile.rocq
-	$(MAKE) -f Makefile.rocq
+# rocq: Makefile.rocq
+# 	$(MAKE) -f Makefile.rocq
+rocq:
+	dune build
 
 html: Makefile.rocq
 	rm -rf html
