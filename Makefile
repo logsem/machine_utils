@@ -16,10 +16,10 @@ all: rocq
 phony: ;
 
 
-rocq: Makefile.rocq
-	$(MAKE) -f Makefile.rocq
-# rocq:
-# 	dune build
+# rocq: Makefile.rocq
+# 	$(MAKE) -f Makefile.rocq
+rocq:
+	dune build --display=short
 
 html: Makefile.rocq
 	rm -rf html
@@ -40,7 +40,10 @@ skip-qed: Makefile.rocq.conf
 ci: skip-qed
 	$(MAKE) -f Makefile.rocq pretty-timed
 
-clean: Makefile.rocq
-	$(MAKE) -f Makefile.rocq clean
-	rm -f Makefile.rocq
-	rm -rf html
+# clean: Makefile.rocq
+# 	$(MAKE) -f Makefile.rocq clean
+# 	rm -f Makefile.rocq
+# 	rm -rf html
+
+clean: 
+	dune clean

@@ -1,4 +1,4 @@
-From iris.proofmode Require Import tactics spec_patterns coq_tactics ltac_tactics reduction.
+From iris.proofmode Require Import proofmode spec_patterns coq_tactics ltac_tactics reduction.
 From iris.base_logic.lib Require Import iprop.
 From machine_utils Require Import solve_pure.
 

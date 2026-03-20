@@ -5,7 +5,8 @@ maintainer: ""
 authors: [ "anonymous" ]
 depends: [
   "dune" {}
-  "coq" {>= "9.0"}
-  "coq-stdpp" {>= "1.12.0"}
-  "coq-iris" {>= "4.4.0"}
+  "rocq-core" {= "9.1.1"}
+  "rocq-stdlib" {= "9.0.0"}
+  "rocq-stdpp" {= "1.13.0"}
+  "rocq-iris" {>= "4.5.0"}
 ]
